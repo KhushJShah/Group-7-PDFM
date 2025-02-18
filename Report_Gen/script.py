@@ -6,7 +6,7 @@ import re
 
 
 class MyRenderer(mistune.HTMLRenderer):  # Correct base class
-    def list_item(self, text, level):
+    def list_item(self, text):
         # Wrap each list item in <li> tags and add a line break
         return f'<li>{text}</li>\n'
 
