@@ -134,65 +134,41 @@ plt.show()
 
 
 # %%
-train_size = int(len(data_diff_numeric) * 0.8)
-train = data_diff_numeric[:train_size]
-test = data_diff_numeric[train_size:]
+from statsmodels.tsa.ar_model import AutoReg
+import matplotlib.pyplot as plt
 
-# Build and train AR model
-lag_order = 24  # Choose based on PACF plot
-ar_model = AutoReg(train, lags=lag_order).fit()
-
-# Make predictions on test set
-predictions = ar_model.predict(start=len(train), end=len(train) + len(test) - 1, dynamic=False)
-# %%
-mae = mean_absolute_error(test, predictions)
-rmse = np.sqrt(mean_squared_error(test, predictions))
-print(f'Mean Absolute Error: {mae:.2f}')
-print(f'Root Mean Squared Error: {rmse:.2f}')
-
-# Plot actual vs predicted values
-plt.figure(figsize=(12, 6))
-plt.plot(range(len(test)), test.values, label='Actual')
-plt.plot(range(len(test)), predictions, label='Predicted', linestyle='--')
-plt.xlabel('Index')
-plt.ylabel('Value')
-plt.title(f'AR Model Predictions for Zip Code {zipcode}')
-plt.legend()
-plt.show()
-# %%
-from statsmodels.tsa.statespace.sarimax import SARIMAX
-
-# Fit SARIMA model to original data
-order = (25, 0, 0)  # Non-seasonal order (p, d, q)
-seasonal_order = (0, 0, 0, 12)  # Seasonal order (P, D, Q, S)
-
-sarima_model = SARIMAX(data['Value'], order=order, seasonal_order=seasonal_order)
-sarima_results = sarima_model.fit()
-
-# Print summary
-print(sarima_results.summary())
-
-# Make predictions on test set
-train_size = int(len(data) * 0.8)
+# Split data into train and test sets
+forecast_steps=3
+train_size = len(data) - forecast_steps # Use all but the last 3 months for training
 train = data['Value'][:train_size]
 test = data['Value'][train_size:]
 
-predictions = sarima_results.predict(start=len(train), end=len(train) + len(test) - 1)
+# Build and train AR model
+lag_order = 12  # Choose based on PACF plot or domain knowledge
+ar_model = AutoReg(train, lags=lag_order).fit()
+
+# Forecast the next 3 months
+forecasted_values = ar_model.forecast(steps=forecast_steps)
 
 # Evaluate model performance
-mae = mean_absolute_error(test, predictions)
-rmse = np.sqrt(mean_squared_error(test, predictions))
-print(f'Mean Absolute Error: {mae:.2f}')
-print(f'Root Mean Squared Error: {rmse:.2f}')
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-# Plot actual vs predicted values
+mae = mean_absolute_error(test, forecasted_values)
+rmse = np.sqrt(mean_squared_error(test, forecasted_values))
+print(f'Mean Absolute Error (MAE): {mae:.2f}')
+print(f'Root Mean Squared Error (RMSE): {rmse:.2f}')
+
+# Plot actual vs forecasted values for the last 3 months
 plt.figure(figsize=(12, 6))
-plt.plot(test.index, test, label='Actual')
-plt.plot(test.index, predictions, label='Predicted', linestyle='--')
-plt.xlabel('Date')
+plt.plot(range(len(train), len(train) + len(test)), test.values, label='Actual', marker='o')
+plt.plot(range(len(train), len(train) + len(test)), forecasted_values, label='Forecasted', linestyle='--', marker='x')
+plt.xlabel('Index')
 plt.ylabel('Value')
-plt.title(f'SARIMA Model Predictions for Zip Code {zipcode}')
+plt.title(f'AR Model Forecast for Last 3 Months for Zip Code {zipcode}')
 plt.legend()
 plt.show()
+
+
+
 
 # %%

@@ -47,12 +47,15 @@ for i in range(len(adj_matrix)):
             edge_attr.append([adj_matrix[i, j]])
 
 # Convert to numpy arrays
-edge_index = np.array(edge_index)
-edge_attr = np.array(edge_attr)
 
+edge_attr = torch.tensor(edge_attr)
+edge_attr = edge_attr.float()
+edge_index = torch.tensor(edge_index).T.contiguous()
+print("edge_attr type:", edge_attr.dtype)
+print("edge_index type:", edge_index.dtype)
 # Count the number of edges
-num_edges = edge_index.shape[0]  # Use shape[0] to get the number of edges
-print(f"Number of edges: {num_edges}")
+num_edges = edge_index.shape[1]
+print("Number of edges:", num_edges)
 
 edge_attr = (edge_attr - edge_attr.mean()) / edge_attr.std()
 
@@ -84,12 +87,25 @@ print(f"Shape of x in first data point: {data_list[0].x.shape}")
 print(f"Shape of y in first data point: {data_list[0].y.shape}")
 
 #%%
+print(type(train_data[0].edge_index))
+print(type(train_data[0].x))
+print(type(train_data[0].edge_attr))
 
-print(f"Edges: {train_data[0].edge_index.size()[1]}, Nodes: {train_data[0].x.size()[0]}")
+print(train_data[0].edge_index.shape)
+print(train_data[0].x.shape)
+print(train_data[0].edge_attr.shape)
 
 
 #%%
-print(train_data)
+print(f"Edges: {train_data[0].edge_index.shape[1]}, Nodes: {train_data[0].x.size(0)}")
+
+#%%
+
+edge_index = torch.tensor(train_data[0].edge_index).T.contiguous()
+print(train_data[0].edge_index.shape)
+
+#%%
+
 #%%
 # Define the ST-GAT model
 class ST_GAT(torch.nn.Module):
@@ -104,6 +120,7 @@ class ST_GAT(torch.nn.Module):
         self.linear = torch.nn.Linear(64, self.n_pred)
 
     def forward(self, data):
+        
         x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
         
         # Process each time step through GAT
@@ -135,7 +152,7 @@ criterion = torch.nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 # Training loop
-n_epochs = 10
+n_epochs = 20
 for epoch in range(n_epochs):
     model.train()
     total_loss = 0
