@@ -12,7 +12,7 @@ import math
 
 #%%
 '''Loading the dataset'''
-df = pd.read_csv('C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/merged_data_unemployment.csv')
+df = pd.read_csv('C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/merged_data_unemployment_r9.csv')
 print(df.head())
 
 #%%
@@ -66,7 +66,7 @@ adj_matrix = nx.to_numpy_array(G, weight='weight')
 node_names = list(G.nodes())
 
 # Define the file path
-file_path = r'C:\Users\nupur\computer\Desktop\Group-7-PDFM\Project\data\adjacency_matrix_with_weights.txt'
+file_path = r'C:\Users\nupur\computer\Desktop\Group-7-PDFM\Project\data\adjacency_matrix_with_weights_r9.txt'
 
 # Save the adjacency matrix with weights and node names
 with open(file_path, 'w') as f:
@@ -86,6 +86,6 @@ node_names = list(G.nodes())
 
 adj_df = pd.DataFrame(adj_matrix, index=node_names, columns=node_names)
 
-csv_file_path = r'C:\Users\nupur\computer\Desktop\Group-7-PDFM\Project\data\adjacency_matrix_with_weights.csv'
+csv_file_path = r'C:\Users\nupur\computer\Desktop\Group-7-PDFM\Project\data\adjacency_matrix_with_weights_r9.csv'
 adj_df.to_csv(csv_file_path)
 # %%
