@@ -20,6 +20,8 @@ mae_list = []
 rmse_list = []
 
 #%%
+metrics = []
+
 for geoid in geoids:
     print(f"Processing geoId: {geoid}")
     
@@ -52,9 +54,8 @@ for geoid in geoids:
         mae = mean_absolute_error(test.values, forecasted_values.values)
         rmse = np.sqrt(mean_squared_error(test.values, forecasted_values.values))
         
-        # Store metrics
-        mae_list.append(mae)
-        rmse_list.append(rmse)
+        # Store metrics in the list
+        metrics.append({'GeoID': geoid, 'MAE': mae, 'RMSE': rmse})
         
         print(f"GeoID: {geoid}, MAE: {mae:.2f}, RMSE: {rmse:.2f}")
     
@@ -62,10 +63,9 @@ for geoid in geoids:
         print(f"Error processing geoId {geoid}: {e}")
         continue
 
-# %%
-average_mae = np.mean(mae_list)
-average_rmse = np.mean(rmse_list)
-
-print(f"\nAverage MAE across all geoIds: {average_mae:.2f}")
-print(f"Average RMSE across all geoIds: {average_rmse:.2f}")
+#%%
+# Save metrics to a CSV file
+metrics_df = pd.DataFrame(metrics)
+metrics_df.to_csv('geoids_metrics.csv', index=False)
+print("Metrics saved to geoids_metrics.csv")
 # %%
