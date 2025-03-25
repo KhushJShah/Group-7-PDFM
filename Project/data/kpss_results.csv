@@ -1,0 +1,91 @@
+zipcode,county,state,p-value,Conclusion
+4001,Apache County,AZ,0.1,Trend-Stationary
+4003,Cochise County,AZ,0.1,Trend-Stationary
+4005,Coconino County,AZ,0.1,Trend-Stationary
+4007,Gila County,AZ,0.1,Trend-Stationary
+4009,Graham County,AZ,0.1,Trend-Stationary
+4011,Greenlee County,AZ,0.0781768083368932,Trend-Stationary
+4012,La Paz County,AZ,0.1,Trend-Stationary
+4013,Maricopa County,AZ,0.1,Trend-Stationary
+4015,Mohave County,AZ,0.1,Trend-Stationary
+4017,Navajo County,AZ,0.1,Trend-Stationary
+4019,Pima County,AZ,0.1,Trend-Stationary
+4021,Pinal County,AZ,0.1,Trend-Stationary
+4023,Santa Cruz County,AZ,0.1,Trend-Stationary
+4025,Yavapai County,AZ,0.1,Trend-Stationary
+4027,Yuma County,AZ,0.1,Trend-Stationary
+6001,Alameda County,CA,0.1,Trend-Stationary
+6003,Alpine County,CA,0.1,Trend-Stationary
+6005,Amador County,CA,0.1,Trend-Stationary
+6007,Butte County,CA,0.1,Trend-Stationary
+6009,Calaveras County,CA,0.1,Trend-Stationary
+6011,Colusa County,CA,0.1,Trend-Stationary
+6013,Contra Costa County,CA,0.1,Trend-Stationary
+6015,Del Norte County,CA,0.1,Trend-Stationary
+6017,El Dorado County,CA,0.1,Trend-Stationary
+6019,Fresno County,CA,0.1,Trend-Stationary
+6021,Glenn County,CA,0.1,Trend-Stationary
+6023,Humboldt County,CA,0.1,Trend-Stationary
+6025,Imperial County,CA,0.1,Trend-Stationary
+6027,Inyo County,CA,0.1,Trend-Stationary
+6029,Kern County,CA,0.01,Not Trend-Stationary
+6031,Kings County,CA,0.1,Trend-Stationary
+6033,Lake County,CA,0.1,Trend-Stationary
+6035,Lassen County,CA,0.1,Trend-Stationary
+6037,Los Angeles County,CA,0.1,Trend-Stationary
+6039,Madera County,CA,0.1,Trend-Stationary
+6041,Marin County,CA,0.1,Trend-Stationary
+6043,Mariposa County,CA,0.1,Trend-Stationary
+6045,Mendocino County,CA,0.1,Trend-Stationary
+6047,Merced County,CA,0.1,Trend-Stationary
+6049,Modoc County,CA,0.1,Trend-Stationary
+6051,Mono County,CA,0.1,Trend-Stationary
+6053,Monterey County,CA,0.1,Trend-Stationary
+6055,Napa County,CA,0.1,Trend-Stationary
+6057,Nevada County,CA,0.1,Trend-Stationary
+6059,Orange County,CA,0.1,Trend-Stationary
+6061,Placer County,CA,0.1,Trend-Stationary
+6063,Plumas County,CA,0.1,Trend-Stationary
+6065,Riverside County,CA,0.1,Trend-Stationary
+6067,Sacramento County,CA,0.1,Trend-Stationary
+6069,San Benito County,CA,0.1,Trend-Stationary
+6071,San Bernardino County,CA,0.1,Trend-Stationary
+6073,San Diego County,CA,0.1,Trend-Stationary
+6075,San Francisco County,CA,0.1,Trend-Stationary
+6077,San Joaquin County,CA,0.1,Trend-Stationary
+6079,San Luis Obispo County,CA,0.1,Trend-Stationary
+6081,San Mateo County,CA,0.1,Trend-Stationary
+6083,Santa Barbara County,CA,0.1,Trend-Stationary
+6085,Santa Clara County,CA,0.1,Trend-Stationary
+6087,Santa Cruz County,CA,0.1,Trend-Stationary
+6089,Shasta County,CA,0.1,Trend-Stationary
+6091,Sierra County,CA,0.1,Trend-Stationary
+6093,Siskiyou County,CA,0.1,Trend-Stationary
+6095,Solano County,CA,0.1,Trend-Stationary
+6097,Sonoma County,CA,0.1,Trend-Stationary
+6099,Stanislaus County,CA,0.1,Trend-Stationary
+6101,Sutter County,CA,0.1,Trend-Stationary
+6103,Tehama County,CA,0.1,Trend-Stationary
+6105,Trinity County,CA,0.1,Trend-Stationary
+6107,Tulare County,CA,0.1,Trend-Stationary
+6109,Tuolumne County,CA,0.1,Trend-Stationary
+6111,Ventura County,CA,0.1,Trend-Stationary
+6113,Yolo County,CA,0.1,Trend-Stationary
+6115,Yuba County,CA,0.1,Trend-Stationary
+32001,Churchill County,NV,0.1,Trend-Stationary
+32003,Clark County,NV,0.020767003260887287,Not Trend-Stationary
+32005,Douglas County,NV,0.1,Trend-Stationary
+32007,Elko County,NV,0.1,Trend-Stationary
+32009,Esmeralda County,NV,0.01,Not Trend-Stationary
+32011,Eureka County,NV,0.1,Trend-Stationary
+32013,Humboldt County,NV,0.1,Trend-Stationary
+32015,Lander County,NV,0.1,Trend-Stationary
+32017,Lincoln County,NV,0.1,Trend-Stationary
+32019,Lyon County,NV,0.1,Trend-Stationary
+32021,Mineral County,NV,0.1,Trend-Stationary
+32023,Nye County,NV,0.1,Trend-Stationary
+32027,Pershing County,NV,0.1,Trend-Stationary
+32029,Storey County,NV,0.1,Trend-Stationary
+32031,Washoe County,NV,0.1,Trend-Stationary
+32033,White Pine County,NV,0.1,Trend-Stationary
+32510,Carson City,NV,0.1,Trend-Stationary

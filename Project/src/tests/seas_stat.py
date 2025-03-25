@@ -201,3 +201,20 @@ county_type_df.to_csv(output_file_path, index=False)
 # Confirm the file path
 print(output_file_path)
 # %%
+zipcode_type_dict = {}
+for zipcode, _, _ in stationary_zipcodes:
+    zipcode_type_dict[zipcode] = 'Stationary'
+for zipcode, _, _ in non_stationary_zipcodes:
+    zipcode_type_dict[zipcode] = 'Non-Stationary'
+
+# Add a new 'Type' column to the DataFrame
+df['Type'] = df['zipcode'].map(zipcode_type_dict)
+
+# Display the updated DataFrame
+print(df.head())
+# %%
+file_path = 'C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/merged_data_unemployment_r9.csv'
+df.to_csv(file_path, index=False)
+
+print(f"Updated CSV file saved to: {file_path}")
+# %%
