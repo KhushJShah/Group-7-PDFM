@@ -1,194 +1,184 @@
-'''In this file, we will explore the GT-GAT model with LSTM'''
-
-#%%
+#%% Final GNN Code with County-wise Metrics
 import torch
 import torch.nn.functional as F
 from torch_geometric.nn import GATConv
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-from torch_geometric.data import Data, DataLoader
+from torch_geometric.data import Data
+import os
 
-#%%
-# Load your dataset
+#%% Data Preparation
+def create_temporal_split(data, n_past=12, n_future=6, test_months=6):
+    """Create temporal split with last 'test_months' as test set"""
+    X_train, y_train = [], []
+    X_test, y_test = [], []
+    
+    split_idx = data.shape[1] - test_months - n_future
+    
+    # Training sequences
+    for i in range(split_idx - n_past + 1):
+        X_train.append(data[:, i:i+n_past, :])
+        y_train.append(data[:, i+n_past:i+n_past+n_future, :])
+    
+    # Test sequences
+    test_start = data.shape[1] - test_months - n_past
+    X_test.append(data[:, test_start:test_start+n_past, :])
+    y_test.append(data[:, -test_months:, :])
+    
+    return np.array(X_train), np.array(y_train), np.array(X_test), np.array(y_test)
+
+# Load data
 df = pd.read_csv('C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/merged_data_unemployment_r9.csv')
-
-#%%
-# Extract time series data
 time_series_data = df.filter(regex='^(19|20)').values
-time_series_data = (time_series_data - np.mean(time_series_data, axis=0)) / np.std(time_series_data, axis=0)
-#%%
-print(time_series_data)
-#%%
-# Extract node features (population density)
-n_counties = 90  # Number of counties
-n_time_steps = time_series_data.shape[1]  # Total time steps in the dataset
+n_counties = len(df)
+n_time_steps = time_series_data.shape[1]
 
-# Reshape to (counties, time_steps, features)
+# Reshape without normalization
 time_series_data = time_series_data.reshape(n_counties, n_time_steps, 1)
 
-print(f"Reshaped time series data shape: {time_series_data.shape}")
-
-# Extract node features (e.g., population density)
-node_features = df['population_density_log10'].values.reshape(-1, 1)
-
-print(f"Node features shape: {node_features.shape}")
-# Load adjacency matrix
-adj_matrix = pd.read_csv('C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/adjacency_matrix_with_weights_r9.csv', index_col=0).values
+# Create temporal split
+X_train, y_train, X_test, y_test = create_temporal_split(time_series_data)
 
 # Prepare graph data
+adj_matrix = pd.read_csv('C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/adjacency_matrix_with_weights_r9.csv', index_col=0).values
 edge_index = []
 edge_attr = []
 
 for i in range(len(adj_matrix)):
     for j in range(i + 1, len(adj_matrix)):
-        if adj_matrix[i, j] != 0:  # Exclude self-loops and zero-weight edges
+        if adj_matrix[i, j] != 0:
             edge_index.append([i, j])
             edge_attr.append([adj_matrix[i, j]])
 
-# Convert to numpy arrays
-
-edge_attr = torch.tensor(edge_attr)
-edge_attr = edge_attr.float()
 edge_index = torch.tensor(edge_index).T.contiguous()
-print("edge_attr type:", edge_attr.dtype)
-print("edge_index type:", edge_index.dtype)
-# Count the number of edges
-num_edges = edge_index.shape[1]
-print("Number of edges:", num_edges)
+edge_attr = torch.tensor(edge_attr).float()
 
-edge_attr = (edge_attr - edge_attr.mean()) / edge_attr.std()
+# Create Data objects
+train_data = [Data(x=torch.tensor(x, dtype=torch.float), 
+                   edge_index=edge_index, 
+                   edge_attr=edge_attr,
+                   y=torch.tensor(y, dtype=torch.float)) 
+              for x, y in zip(X_train, y_train)]
 
-
-#%%
-# Prepare data for LSTM
-def create_sequences(data, n_past=12, n_future=3):
-    X, y = [], []
-    for i in range(data.shape[1] - n_past - n_future + 1):
-        X.append(data[:, i:i+n_past, :])
-        y.append(data[:, i+n_past:i+n_past+n_future, :])
-    return np.array(X), np.array(y)
-
-X, y = create_sequences(time_series_data)
-
-# Create PyTorch Geometric Data objects
-data_list = [Data(x=torch.tensor(x, dtype=torch.float),
+test_data = [Data(x=torch.tensor(x, dtype=torch.float),
                   edge_index=edge_index,
                   edge_attr=edge_attr,
-                  y=torch.tensor(y[i], dtype=torch.float))
-             for i, x in enumerate(X)]
+                  y=torch.tensor(y, dtype=torch.float))
+             for x, y in zip(X_test, y_test)]
 
-# Split data into train and test sets
-train_data = data_list[:-12]  # Use last year for testing
-test_data = data_list[-12:]
-
-print(f"Number of data points: {len(data_list)}")
-print(f"Shape of x in first data point: {data_list[0].x.shape}")
-print(f"Shape of y in first data point: {data_list[0].y.shape}")
-
-#%%
-print(type(train_data[0].edge_index))
-print(type(train_data[0].x))
-print(type(train_data[0].edge_attr))
-
-print(train_data[0].edge_index.shape)
-print(train_data[0].x.shape)
-print(train_data[0].edge_attr.shape)
-
-
-#%%
-print(f"Edges: {train_data[0].edge_index.shape[1]}, Nodes: {train_data[0].x.size(0)}")
-
-#%%
-
-edge_index = torch.tensor(train_data[0].edge_index).T.contiguous()
-print(train_data[0].edge_index.shape)
-
-#%%
-
-#%%
-# Define the ST-GAT model
+#%% Model Architecture
 class ST_GAT(torch.nn.Module):
     def __init__(self, in_channels, out_channels, n_nodes, heads=12, dropout=0.0):
-        super(ST_GAT, self).__init__()
+        super().__init__()
         self.n_pred = out_channels
         self.n_nodes = n_nodes
         self.gat_out_channels = 64
 
-        self.gat = GATConv(in_channels, self.gat_out_channels, heads=heads, dropout=dropout, concat=False, edge_dim=1)
-        self.lstm = torch.nn.LSTM(input_size=self.gat_out_channels, hidden_size=64, num_layers=2, batch_first=True)
+        self.gat = GATConv(in_channels, self.gat_out_channels, heads=heads, 
+                          dropout=dropout, concat=False, edge_dim=1)
+        self.lstm = torch.nn.LSTM(input_size=self.gat_out_channels, 
+                                 hidden_size=64, num_layers=2, batch_first=True)
         self.linear = torch.nn.Linear(64, self.n_pred)
 
     def forward(self, data):
-        
         x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
         
-        # Process each time step through GAT
+        # GAT processing
         out = []
         for t in range(x.size(1)):
             h = self.gat(x[:, t, :], edge_index, edge_attr)
             out.append(h)
+        x = torch.stack(out, dim=1)
         
-        x = torch.stack(out, dim=1)  # [n_nodes, time_steps, gat_out_channels]
-        
-        # LSTM layer
+        # LSTM processing
         x, _ = self.lstm(x)
-        x = x[:, -1, :]  # Take the last output
+        x = x[:, -1, :]
         
-        # Linear layer
+        # Final prediction
         x = self.linear(x)
-        
-        return x.unsqueeze(-1) 
+        return x.unsqueeze(-1)
 
+#%% Training and Evaluation
+def plot_predictions(zipcode, actual, pred, county, state):
+    """Plot predictions vs actual values"""
+    os.makedirs("gnn_plots", exist_ok=True)
+    
+    plt.figure(figsize=(12, 6))
+    plt.plot(actual, label='Actual', marker='o')
+    plt.plot(pred, label='Predicted', linestyle='--', marker='x')
+    plt.title(f'GNN Predictions - {county}, {state} ({zipcode})')
+    plt.xlabel('Month')
+    plt.ylabel('Unemployment Rate')
+    plt.legend()
+    plt.savefig(f"gnn_plots/{zipcode}_predictions.png", dpi=300)
+    plt.close()
 
-
-
-
-
-#%%
-# Initialize model, loss function, and optimizer
-model = ST_GAT(in_channels=1, out_channels=3, n_nodes=90)
-criterion = torch.nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-# Training loop
-n_epochs = 30
-for epoch in range(n_epochs):
+def main():
+    # Initialize model
+    model = ST_GAT(in_channels=1, out_channels=6, n_nodes=n_counties)
+    criterion = torch.nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    
+    # Training loop
     model.train()
-    total_loss = 0
-    for data in train_data:
-        optimizer.zero_grad()
-        out = model(data)
-        loss = criterion(out, data.y)
-        loss.backward()
-        optimizer.step()
-        total_loss += loss.item()
-    print(f'Epoch {epoch+1}, Loss: {total_loss/len(train_data)}')
+    for epoch in range(30):
+        total_loss = 0
+        for data in train_data:
+            optimizer.zero_grad()
+            pred = model(data)
+            loss = criterion(pred, data.y)
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
+        print(f'Epoch {epoch+1}, Loss: {total_loss/len(train_data):.4f}')
+    
+    # Evaluation
+    model.eval()
+    predictions = []
+    with torch.no_grad():
+        for data in test_data:
+            pred = model(data)
+            predictions.append(pred.numpy())
+    
+    # Process predictions
+    predictions = np.concatenate(predictions, axis=0).squeeze(-1)
+    actuals = np.concatenate([d.y.numpy() for d in test_data], axis=0).squeeze(-1)
+    
+    # Calculate and save county-wise metrics
+    results = []
+    zipcodes = df['zipcode'].values
+    for idx in range(n_counties):
+        zipcode = zipcodes[idx]
+        county = df.iloc[idx]['county']
+        state = df.iloc[idx]['state']
+        
+        actual_ts = time_series_data[idx, -6:, 0]
+        pred_ts = predictions[0, idx, :]
+        
+        # Calculate metrics
+        mae = mean_absolute_error(actual_ts, pred_ts)
+        rmse = np.sqrt(mean_squared_error(actual_ts, pred_ts))
+        
+        # Store results
+        results.append({
+            'zipcode': zipcode,
+            'county': county,
+            'state': state,
+            'MAE': round(mae, 4),
+            'RMSE': round(rmse, 4)
+        })
+        
+        # Generate plot
+        plot_predictions(zipcode, actual_ts, pred_ts, county, state)
+    
+    # Save metrics to CSV
+    results_df = pd.DataFrame(results)
+    results_df.to_csv('gnn_county_metrics.csv', index=False)
+    print("\nMetrics saved to gnn_county_metrics.csv")
 
-#%%
-# Evaluation
-model.eval()
-predictions = []
-true_values = []
-
-with torch.no_grad():
-    for data in test_data:
-        out = model(data)
-        predictions.append(out.numpy())
-        true_values.append(data.y.numpy())
-
-predictions = np.concatenate(predictions)
-true_values = np.concatenate(true_values)
-
-# Reshape to 2D arrays
-predictions = predictions.reshape(-1, predictions.shape[-1])
-true_values = true_values.reshape(-1, true_values.shape[-1])
-
-# Calculate MAE and RMSE
-mae = mean_absolute_error(true_values, predictions)
-rmse = np.sqrt(mean_squared_error(true_values, predictions))
-
-print(f'Mean Absolute Error: {mae}')
-print(f'Root Mean Squared Error: {rmse}')
+if __name__ == "__main__":
+    main()
 
 # %%

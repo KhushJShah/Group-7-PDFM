@@ -1,0 +1,91 @@
+zipcode,county,state,RMSE,MAE,Type
+4001,Apache County,AZ,1.42,0.94,Non-Stationary
+4003,Cochise County,AZ,0.94,0.65,Non-Stationary
+4005,Coconino County,AZ,0.64,0.58,Non-Stationary
+4007,Gila County,AZ,1.84,1.45,Non-Stationary
+4009,Graham County,AZ,1.43,1.08,Non-Stationary
+4011,Greenlee County,AZ,0.97,0.82,Stationary
+4012,La Paz County,AZ,0.5,0.4,Non-Stationary
+4013,Maricopa County,AZ,1.16,0.91,Non-Stationary
+4015,Mohave County,AZ,1.03,0.81,Non-Stationary
+4017,Navajo County,AZ,1.83,1.34,Non-Stationary
+4019,Pima County,AZ,0.97,0.71,Non-Stationary
+4021,Pinal County,AZ,1.17,1.02,Stationary
+4023,Santa Cruz County,AZ,0.99,0.75,Non-Stationary
+4025,Yavapai County,AZ,1.01,0.79,Non-Stationary
+4027,Yuma County,AZ,5.64,4.76,Non-Stationary
+6001,Alameda County,CA,0.26,0.24,Stationary
+6003,Alpine County,CA,1.96,1.79,Non-Stationary
+6005,Amador County,CA,1.17,0.86,Non-Stationary
+6007,Butte County,CA,1.57,1.23,Non-Stationary
+6009,Calaveras County,CA,1.22,0.91,Non-Stationary
+6011,Colusa County,CA,5.14,4.48,Non-Stationary
+6013,Contra Costa County,CA,2.48,2.05,Non-Stationary
+6015,Del Norte County,CA,1.68,1.28,Non-Stationary
+6017,El Dorado County,CA,1.71,1.38,Non-Stationary
+6019,Fresno County,CA,1.71,1.29,Non-Stationary
+6021,Glenn County,CA,0.78,0.65,Non-Stationary
+6023,Humboldt County,CA,1.14,0.81,Non-Stationary
+6025,Imperial County,CA,7.54,6.43,Non-Stationary
+6027,Inyo County,CA,0.48,0.36,Non-Stationary
+6029,Kern County,CA,1.17,0.99,Stationary
+6031,Kings County,CA,0.9,0.62,Non-Stationary
+6033,Lake County,CA,1.65,1.22,Non-Stationary
+6035,Lassen County,CA,1.17,0.91,Non-Stationary
+6037,Los Angeles County,CA,0.56,0.49,Stationary
+6039,Madera County,CA,1.3,1.05,Non-Stationary
+6041,Marin County,CA,0.23,0.2,Stationary
+6043,Mariposa County,CA,0.77,0.58,Non-Stationary
+6045,Mendocino County,CA,1.12,0.79,Non-Stationary
+6047,Merced County,CA,1.14,0.77,Non-Stationary
+6049,Modoc County,CA,2.45,1.88,Non-Stationary
+6051,Mono County,CA,0.17,0.11,Non-Stationary
+6053,Monterey County,CA,2.33,2.0,Non-Stationary
+6055,Napa County,CA,0.72,0.49,Non-Stationary
+6057,Nevada County,CA,0.96,0.72,Non-Stationary
+6059,Orange County,CA,1.94,1.62,Non-Stationary
+6061,Placer County,CA,1.94,1.58,Non-Stationary
+6063,Plumas County,CA,2.62,2.16,Non-Stationary
+6065,Riverside County,CA,2.63,2.2,Non-Stationary
+6067,Sacramento County,CA,1.91,1.57,Non-Stationary
+6069,San Benito County,CA,0.79,0.53,Non-Stationary
+6071,San Bernardino County,CA,2.56,2.14,Non-Stationary
+6073,San Diego County,CA,1.94,1.58,Non-Stationary
+6075,San Francisco County,CA,0.29,0.24,Stationary
+6077,San Joaquin County,CA,2.74,2.24,Non-Stationary
+6079,San Luis Obispo County,CA,1.27,1.02,Non-Stationary
+6081,San Mateo County,CA,0.18,0.16,Stationary
+6083,Santa Barbara County,CA,0.89,0.72,Stationary
+6085,Santa Clara County,CA,0.24,0.21,Stationary
+6087,Santa Cruz County,CA,1.21,0.7,Non-Stationary
+6089,Shasta County,CA,0.82,0.57,Non-Stationary
+6091,Sierra County,CA,1.45,1.18,Non-Stationary
+6093,Siskiyou County,CA,1.15,0.87,Non-Stationary
+6095,Solano County,CA,1.41,1.09,Non-Stationary
+6097,Sonoma County,CA,1.25,0.99,Non-Stationary
+6099,Stanislaus County,CA,1.85,1.47,Non-Stationary
+6101,Sutter County,CA,0.89,0.71,Non-Stationary
+6103,Tehama County,CA,0.68,0.45,Non-Stationary
+6105,Trinity County,CA,0.72,0.63,Non-Stationary
+6107,Tulare County,CA,1.95,1.37,Non-Stationary
+6109,Tuolumne County,CA,0.98,0.7,Non-Stationary
+6111,Ventura County,CA,2.39,1.96,Non-Stationary
+6113,Yolo County,CA,1.5,1.1,Non-Stationary
+6115,Yuba County,CA,1.99,1.53,Non-Stationary
+32001,Churchill County,NV,0.36,0.32,Non-Stationary
+32003,Clark County,NV,0.61,0.57,Stationary
+32005,Douglas County,NV,0.76,0.65,Non-Stationary
+32007,Elko County,NV,0.4,0.36,Non-Stationary
+32009,Esmeralda County,NV,0.58,0.5,Stationary
+32011,Eureka County,NV,0.54,0.38,Non-Stationary
+32013,Humboldt County,NV,0.52,0.49,Non-Stationary
+32015,Lander County,NV,0.84,0.66,Non-Stationary
+32017,Lincoln County,NV,0.65,0.6,Non-Stationary
+32019,Lyon County,NV,0.35,0.3,Non-Stationary
+32021,Mineral County,NV,5.14,4.39,Non-Stationary
+32023,Nye County,NV,1.48,1.19,Non-Stationary
+32027,Pershing County,NV,1.39,1.23,Non-Stationary
+32029,Storey County,NV,0.31,0.25,Non-Stationary
+32031,Washoe County,NV,0.57,0.48,Non-Stationary
+32033,White Pine County,NV,0.58,0.53,Non-Stationary
+32510,Carson City,NV,0.67,0.62,Non-Stationary

@@ -1,0 +1,91 @@
+zipcode,county,state,best_order,best_seasonal_order,train_rmse,train_mae,test_rmse,test_mae,heteroskedasticity,subplot_path
+4001,Apache County,AZ,"(0, 1, 0)","(0, 0, 1, 12)",1.5161,0.9727,0.5658,0.4589,False,sarima_plots/4001_subplot.png
+4003,Cochise County,AZ,"(0, 0, 1)","(1, 0, 0, 12)",1.3514,0.7435,0.6269,0.4265,False,sarima_plots/4003_subplot.png
+4005,Coconino County,AZ,"(1, 0, 1)","(0, 0, 1, 12)",1.0095,0.5609,0.5307,0.4249,False,sarima_plots/4005_subplot.png
+4007,Gila County,AZ,"(0, 0, 0)","(1, 1, 1, 12)",2.1514,1.4012,0.567,0.3792,False,sarima_plots/4007_subplot.png
+4009,Graham County,AZ,"(1, 0, 1)","(0, 0, 1, 12)",0.7391,0.4571,0.5231,0.3439,False,sarima_plots/4009_subplot.png
+4011,Greenlee County,AZ,"(1, 0, 1)","(0, 0, 0, 12)",0.9428,0.5663,0.3767,0.3234,False,sarima_plots/4011_subplot.png
+4012,La Paz County,AZ,"(1, 0, 1)","(0, 0, 0, 12)",0.8404,0.5682,0.417,0.3704,False,sarima_plots/4012_subplot.png
+4013,Maricopa County,AZ,"(0, 0, 1)","(1, 0, 0, 12)",1.1967,0.6443,0.4439,0.4049,False,sarima_plots/4013_subplot.png
+4015,Mohave County,AZ,"(1, 0, 0)","(1, 0, 0, 12)",0.9212,0.432,0.4724,0.3711,False,sarima_plots/4015_subplot.png
+4017,Navajo County,AZ,"(1, 0, 0)","(0, 0, 1, 12)",1.2741,0.7766,0.5025,0.4163,False,sarima_plots/4017_subplot.png
+4019,Pima County,AZ,"(0, 0, 1)","(1, 0, 0, 12)",1.1861,0.6309,0.5138,0.4431,False,sarima_plots/4019_subplot.png
+4021,Pinal County,AZ,"(1, 0, 1)","(0, 0, 0, 12)",0.6762,0.3945,0.532,0.3328,False,sarima_plots/4021_subplot.png
+4023,Santa Cruz County,AZ,"(1, 0, 1)","(0, 0, 1, 12)",1.5423,1.0213,0.8621,0.7322,False,sarima_plots/4023_subplot.png
+4025,Yavapai County,AZ,"(1, 0, 0)","(0, 0, 0, 12)",0.7218,0.3585,0.4024,0.3131,False,sarima_plots/4025_subplot.png
+4027,Yuma County,AZ,"(1, 0, 1)","(0, 0, 1, 12)",2.2097,1.5838,2.0601,1.825,False,sarima_plots/4027_subplot.png
+6001,Alameda County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.8269,0.3092,0.2429,0.1801,False,sarima_plots/6001_subplot.png
+6003,Alpine County,CA,"(1, 0, 1)","(0, 0, 0, 12)",3.3258,1.8582,0.2049,0.1644,False,sarima_plots/6003_subplot.png
+6005,Amador County,CA,"(1, 1, 0)","(1, 0, 1, 12)",0.7346,0.3515,0.4256,0.3559,False,sarima_plots/6005_subplot.png
+6007,Butte County,CA,"(1, 0, 1)","(0, 1, 1, 12)",0.9177,0.4065,0.4787,0.3692,False,sarima_plots/6007_subplot.png
+6009,Calaveras County,CA,"(1, 0, 0)","(1, 1, 1, 12)",0.8435,0.3987,0.3687,0.2804,False,sarima_plots/6009_subplot.png
+6011,Colusa County,CA,"(1, 0, 0)","(0, 1, 1, 12)",2.1217,1.155,2.9614,2.8092,False,sarima_plots/6011_subplot.png
+6013,Contra Costa County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.8401,0.3031,0.247,0.2149,False,sarima_plots/6013_subplot.png
+6015,Del Norte County,CA,"(0, 1, 1)","(1, 1, 1, 12)",1.2723,0.5668,0.362,0.2902,False,sarima_plots/6015_subplot.png
+6017,El Dorado County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.9058,0.381,0.2733,0.2249,False,sarima_plots/6017_subplot.png
+6019,Fresno County,CA,"(1, 0, 0)","(0, 1, 1, 12)",1.1224,0.473,0.3891,0.3364,False,sarima_plots/6019_subplot.png
+6021,Glenn County,CA,"(1, 0, 0)","(0, 1, 1, 12)",1.2532,0.6785,0.6659,0.6164,False,sarima_plots/6021_subplot.png
+6023,Humboldt County,CA,"(1, 1, 1)","(0, 1, 0, 12)",1.0414,0.4463,0.4139,0.3446,False,sarima_plots/6023_subplot.png
+6025,Imperial County,CA,"(1, 0, 0)","(1, 0, 0, 12)",2.0136,1.0443,0.7207,0.5863,False,sarima_plots/6025_subplot.png
+6027,Inyo County,CA,"(1, 1, 1)","(1, 1, 1, 12)",0.8565,0.3889,0.3163,0.278,False,sarima_plots/6027_subplot.png
+6029,Kern County,CA,"(1, 1, 1)","(1, 1, 1, 12)",0.9779,0.4852,0.4534,0.3708,False,sarima_plots/6029_subplot.png
+6031,Kings County,CA,"(1, 0, 0)","(1, 1, 1, 12)",1.1719,0.5884,0.6148,0.5597,False,sarima_plots/6031_subplot.png
+6033,Lake County,CA,"(1, 0, 1)","(0, 1, 1, 12)",0.9896,0.4568,0.4875,0.3883,False,sarima_plots/6033_subplot.png
+6035,Lassen County,CA,"(1, 0, 1)","(1, 1, 1, 12)",1.1344,0.5004,1.1112,1.0296,False,sarima_plots/6035_subplot.png
+6037,Los Angeles County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.8954,0.3532,0.384,0.3497,False,sarima_plots/6037_subplot.png
+6039,Madera County,CA,"(1, 0, 1)","(1, 1, 1, 12)",1.382,0.7095,0.3878,0.3184,False,sarima_plots/6039_subplot.png
+6041,Marin County,CA,"(1, 1, 0)","(1, 0, 0, 12)",0.5498,0.2501,0.2043,0.17,False,sarima_plots/6041_subplot.png
+6043,Mariposa County,CA,"(1, 1, 0)","(1, 0, 0, 12)",1.3362,0.7106,0.5931,0.524,False,sarima_plots/6043_subplot.png
+6045,Mendocino County,CA,"(1, 0, 1)","(1, 1, 1, 12)",0.9921,0.4565,0.4434,0.3618,False,sarima_plots/6045_subplot.png
+6047,Merced County,CA,"(1, 0, 0)","(0, 1, 1, 12)",1.259,0.5764,0.9449,0.8608,False,sarima_plots/6047_subplot.png
+6049,Modoc County,CA,"(1, 0, 1)","(1, 1, 1, 12)",1.062,0.568,1.497,1.452,False,sarima_plots/6049_subplot.png
+6051,Mono County,CA,"(0, 1, 0)","(0, 0, 1, 12)",2.1194,1.0366,0.1599,0.1305,False,sarima_plots/6051_subplot.png
+6053,Monterey County,CA,"(1, 0, 1)","(0, 1, 1, 12)",1.2081,0.5454,1.5184,1.3241,False,sarima_plots/6053_subplot.png
+6055,Napa County,CA,"(0, 0, 0)","(1, 1, 1, 12)",2.0286,1.3964,0.4642,0.285,False,sarima_plots/6055_subplot.png
+6057,Nevada County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.9167,0.3707,0.2502,0.1788,False,sarima_plots/6057_subplot.png
+6059,Orange County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.8058,0.2995,0.1908,0.1661,False,sarima_plots/6059_subplot.png
+6061,Placer County,CA,"(1, 1, 0)","(0, 1, 0, 12)",0.7743,0.314,0.267,0.2212,False,sarima_plots/6061_subplot.png
+6063,Plumas County,CA,"(0, 0, 0)","(1, 1, 1, 12)",2.7471,1.7343,1.8471,1.6804,False,sarima_plots/6063_subplot.png
+6065,Riverside County,CA,"(0, 1, 0)","(0, 0, 1, 12)",0.7943,0.4299,0.2141,0.1799,False,sarima_plots/6065_subplot.png
+6067,Sacramento County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.8066,0.331,0.2581,0.195,False,sarima_plots/6067_subplot.png
+6069,San Benito County,CA,"(1, 1, 1)","(0, 1, 1, 12)",1.1994,0.6098,0.4337,0.3446,False,sarima_plots/6069_subplot.png
+6071,San Bernardino County,CA,"(0, 1, 0)","(0, 0, 1, 12)",0.6641,0.3524,0.2442,0.2118,False,sarima_plots/6071_subplot.png
+6073,San Diego County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.8901,0.3271,0.2319,0.203,False,sarima_plots/6073_subplot.png
+6075,San Francisco County,CA,"(0, 1, 0)","(1, 0, 0, 12)",0.6267,0.2914,0.177,0.1464,False,sarima_plots/6075_subplot.png
+6077,San Joaquin County,CA,"(1, 0, 1)","(1, 1, 1, 12)",1.0384,0.4573,0.3722,0.3331,False,sarima_plots/6077_subplot.png
+6079,San Luis Obispo County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.8791,0.3481,0.2889,0.2342,False,sarima_plots/6079_subplot.png
+6081,San Mateo County,CA,"(1, 1, 0)","(1, 0, 0, 12)",0.5461,0.251,0.1681,0.1505,False,sarima_plots/6081_subplot.png
+6083,Santa Barbara County,CA,"(0, 0, 1)","(1, 1, 1, 12)",1.2268,0.7278,0.5146,0.4345,False,sarima_plots/6083_subplot.png
+6085,Santa Clara County,CA,"(0, 1, 0)","(1, 0, 0, 12)",0.5733,0.273,0.2322,0.1937,False,sarima_plots/6085_subplot.png
+6087,Santa Cruz County,CA,"(0, 1, 1)","(0, 1, 0, 12)",1.0227,0.4737,0.4657,0.45,False,sarima_plots/6087_subplot.png
+6089,Shasta County,CA,"(1, 0, 1)","(0, 1, 1, 12)",0.9754,0.4248,0.4462,0.2993,False,sarima_plots/6089_subplot.png
+6091,Sierra County,CA,"(1, 0, 0)","(1, 1, 1, 12)",1.6493,0.8538,1.1524,1.0557,False,sarima_plots/6091_subplot.png
+6093,Siskiyou County,CA,"(1, 0, 1)","(0, 1, 1, 12)",1.2913,0.5387,0.8131,0.6921,False,sarima_plots/6093_subplot.png
+6095,Solano County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.8529,0.3507,0.2787,0.2173,False,sarima_plots/6095_subplot.png
+6097,Sonoma County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.9173,0.3291,0.2995,0.2174,False,sarima_plots/6097_subplot.png
+6099,Stanislaus County,CA,"(1, 0, 1)","(1, 1, 1, 12)",1.1509,0.5162,0.3401,0.3084,False,sarima_plots/6099_subplot.png
+6101,Sutter County,CA,"(1, 0, 1)","(0, 1, 1, 12)",1.4831,0.6723,0.7568,0.7437,False,sarima_plots/6101_subplot.png
+6103,Tehama County,CA,"(1, 1, 1)","(0, 1, 1, 12)",0.8934,0.4715,0.3832,0.317,False,sarima_plots/6103_subplot.png
+6105,Trinity County,CA,"(1, 0, 0)","(1, 1, 1, 12)",1.4993,0.6786,0.8645,0.8161,False,sarima_plots/6105_subplot.png
+6107,Tulare County,CA,"(1, 0, 0)","(0, 1, 1, 12)",1.201,0.6245,0.4891,0.4058,False,sarima_plots/6107_subplot.png
+6109,Tuolumne County,CA,"(0, 1, 1)","(1, 0, 1, 12)",0.9464,0.4206,0.4435,0.4006,False,sarima_plots/6109_subplot.png
+6111,Ventura County,CA,"(1, 1, 1)","(0, 1, 0, 12)",0.8509,0.3753,0.2341,0.2242,False,sarima_plots/6111_subplot.png
+6113,Yolo County,CA,"(1, 0, 1)","(1, 1, 1, 12)",0.779,0.3481,0.4842,0.432,False,sarima_plots/6113_subplot.png
+6115,Yuba County,CA,"(1, 0, 1)","(1, 1, 1, 12)",1.1447,0.5535,0.5764,0.5187,False,sarima_plots/6115_subplot.png
+32001,Churchill County,NV,"(1, 1, 1)","(1, 0, 0, 12)",0.8263,0.4436,0.1075,0.0848,False,sarima_plots/32001_subplot.png
+32003,Clark County,NV,"(1, 0, 0)","(0, 1, 0, 12)",1.9947,0.5073,0.0614,0.054,False,sarima_plots/32003_subplot.png
+32005,Douglas County,NV,"(0, 1, 0)","(1, 0, 0, 12)",1.0039,0.4264,0.1065,0.0808,False,sarima_plots/32005_subplot.png
+32007,Elko County,NV,"(0, 1, 0)","(1, 0, 0, 12)",0.8685,0.3931,0.1583,0.1366,False,sarima_plots/32007_subplot.png
+32009,Esmeralda County,NV,"(1, 0, 0)","(0, 1, 1, 12)",1.3567,0.8868,0.7592,0.683,False,sarima_plots/32009_subplot.png
+32011,Eureka County,NV,"(0, 1, 1)","(1, 0, 1, 12)",1.103,0.7447,0.6784,0.5897,False,sarima_plots/32011_subplot.png
+32013,Humboldt County,NV,"(0, 1, 1)","(1, 0, 1, 12)",0.5837,0.3388,0.2549,0.1716,False,sarima_plots/32013_subplot.png
+32015,Lander County,NV,"(1, 1, 1)","(1, 0, 0, 12)",0.8545,0.4931,0.0922,0.0832,False,sarima_plots/32015_subplot.png
+32017,Lincoln County,NV,"(1, 1, 1)","(1, 0, 0, 12)",0.9265,0.5958,0.1463,0.1191,False,sarima_plots/32017_subplot.png
+32019,Lyon County,NV,"(1, 1, 1)","(1, 0, 1, 12)",0.9713,0.4636,0.3583,0.3184,False,sarima_plots/32019_subplot.png
+32021,Mineral County,NV,"(0, 0, 1)","(1, 0, 0, 12)",1.6886,1.1412,0.6453,0.5825,False,sarima_plots/32021_subplot.png
+32023,Nye County,NV,"(0, 1, 0)","(1, 0, 0, 12)",0.8811,0.4195,0.1681,0.15,False,sarima_plots/32023_subplot.png
+32027,Pershing County,NV,"(1, 1, 1)","(1, 1, 0, 12)",0.7645,0.4999,0.4283,0.4085,False,sarima_plots/32027_subplot.png
+32029,Storey County,NV,"(1, 1, 0)","(1, 0, 1, 12)",1.1468,0.609,0.3097,0.2744,False,sarima_plots/32029_subplot.png
+32031,Washoe County,NV,"(0, 1, 1)","(1, 0, 1, 12)",0.8946,0.2828,0.2082,0.17,False,sarima_plots/32031_subplot.png
+32033,White Pine County,NV,"(1, 0, 1)","(0, 1, 1, 12)",0.702,0.4238,0.1638,0.1264,False,sarima_plots/32033_subplot.png
+32510,Carson City,NV,"(1, 1, 1)","(1, 0, 1, 12)",0.9812,0.3858,0.2229,0.1805,False,sarima_plots/32510_subplot.png
