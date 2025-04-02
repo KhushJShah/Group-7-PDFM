@@ -70,7 +70,7 @@ test_data = [Data(x=torch.tensor(x, dtype=torch.float),
 
 #%% Model Architecture
 class ST_GAT(torch.nn.Module):
-    def __init__(self, in_channels, out_channels, n_nodes, heads=12, dropout=0.0):
+    def __init__(self, in_channels, out_channels, n_nodes, heads=14, dropout=0.0):
         super().__init__()
         self.n_pred = out_channels
         self.n_nodes = n_nodes
@@ -79,40 +79,60 @@ class ST_GAT(torch.nn.Module):
         self.gat = GATConv(in_channels, self.gat_out_channels, heads=heads, 
                           dropout=dropout, concat=False, edge_dim=1)
         self.lstm = torch.nn.LSTM(input_size=self.gat_out_channels, 
-                                 hidden_size=64, num_layers=2, batch_first=True)
+                                 hidden_size=64, num_layers=6, batch_first=True)
         self.linear = torch.nn.Linear(64, self.n_pred)
 
     def forward(self, data):
         x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
+        
+        #print(f"\nInput shape: {x.shape}")  # [nodes, time_steps, features]
         
         # GAT processing
         out = []
         for t in range(x.size(1)):
             h = self.gat(x[:, t, :], edge_index, edge_attr)
             out.append(h)
+            
+            
         x = torch.stack(out, dim=1)
+        #print(f"After GAT stacking: {x.shape}")  # [nodes, time_steps, features]
         
         # LSTM processing
         x, _ = self.lstm(x)
-        x = x[:, -1, :]
+        #print(f"After LSTM: {x.shape}")  # [nodes, time_steps, hidden_size]
+        x = x[:, -1, :]  # Take last output
+        #print(f"After LSTM selection: {x.shape}")  # [nodes, hidden_size]
         
         # Final prediction
         x = self.linear(x)
-        return x.unsqueeze(-1)
+        #print(f"After Linear: {x.shape}")  # [nodes, pred_steps]
+        return x.unsqueeze(-1)  # [nodes, pred_steps, 1]
 
 #%% Training and Evaluation
-def plot_predictions(zipcode, actual, pred, county, state):
-    """Plot predictions vs actual values"""
+def plot_predictions(zipcode, train_actual, train_pred, test_actual, test_pred, county, state):
+    """Plot training and test predictions in subplots"""
     os.makedirs("gnn_plots", exist_ok=True)
     
-    plt.figure(figsize=(12, 6))
-    plt.plot(actual, label='Actual', marker='o')
-    plt.plot(pred, label='Predicted', linestyle='--', marker='x')
-    plt.title(f'GNN Predictions - {county}, {state} ({zipcode})')
-    plt.xlabel('Month')
-    plt.ylabel('Unemployment Rate')
-    plt.legend()
-    plt.savefig(f"gnn_plots/{zipcode}_predictions.png", dpi=300)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
+    
+    # Training plot
+    ax1.plot(train_actual, label='Actual', marker='o')
+    ax1.plot(train_pred, label='Predicted', linestyle='--', marker='x')
+    ax1.set_title(f'Training Predictions - {county}, {state} ({zipcode})')
+    ax1.set_xlabel('Training Time Steps')
+    ax1.set_ylabel('Unemployment Rate')
+    ax1.legend()
+    
+    # Test plot
+    ax2.plot(test_actual, label='Actual', marker='o')
+    ax2.plot(test_pred, label='Predicted', linestyle='--', marker='x')
+    ax2.set_title(f'Test Forecast - {county}, {state} ({zipcode})')
+    ax2.set_xlabel('Test Time Steps')
+    ax2.set_ylabel('Unemployment Rate')
+    ax2.legend()
+    
+    plt.tight_layout()
+    plt.savefig(f"gnn_plots/{zipcode}_combined.png", dpi=300)
     plt.close()
 
 def main():
@@ -123,7 +143,7 @@ def main():
     
     # Training loop
     model.train()
-    for epoch in range(30):
+    for epoch in range(50):
         total_loss = 0
         for data in train_data:
             optimizer.zero_grad()
@@ -136,16 +156,29 @@ def main():
     
     # Evaluation
     model.eval()
-    predictions = []
+    train_preds, test_preds = [], []
+    
     with torch.no_grad():
+        # Training predictions
+        for data in train_data:
+            train_preds.append(model(data).numpy())
+        
+        # Test predictions
         for data in test_data:
-            pred = model(data)
-            predictions.append(pred.numpy())
+            test_preds.append(model(data).numpy())
     
     # Process predictions
-    predictions = np.concatenate(predictions, axis=0).squeeze(-1)
-    actuals = np.concatenate([d.y.numpy() for d in test_data], axis=0).squeeze(-1)
+    train_preds = np.concatenate(train_preds, axis=0).squeeze(-1)
+    test_preds = np.concatenate(test_preds, axis=0).squeeze(-1)
     
+    # Get actual values
+    train_actuals = np.concatenate([d.y.numpy() for d in train_data], axis=0).squeeze(-1)
+    test_actuals = np.concatenate([d.y.numpy() for d in test_data], axis=0).squeeze(-1)
+
+    print("\nShapes for Verification:")
+    print(f"Train preds: {train_preds.shape}, Train actuals: {train_actuals.shape}")
+    print(f"Test preds: {test_preds.shape}, Test actuals: {test_actuals.shape}")
+
     # Calculate and save county-wise metrics
     results = []
     zipcodes = df['zipcode'].values
@@ -154,29 +187,36 @@ def main():
         county = df.iloc[idx]['county']
         state = df.iloc[idx]['state']
         
-        actual_ts = time_series_data[idx, -6:, 0]
-        pred_ts = predictions[0, idx, :]
+        # Corrected indexing for 2D arrays
+        train_actual = train_actuals[idx, :].flatten()  # Changed from [:, idx, :]
+        train_pred = train_preds[idx, :].flatten()      # Changed from [:, idx, :]
+        test_actual = test_actuals[idx, :].flatten()    # Changed from [:, idx, :]
+        test_pred = test_preds[idx, :].flatten()        # Changed from [:, idx, :]
         
         # Calculate metrics
-        mae = mean_absolute_error(actual_ts, pred_ts)
-        rmse = np.sqrt(mean_squared_error(actual_ts, pred_ts))
+        train_mae = mean_absolute_error(train_actual, train_pred)
+        train_rmse = np.sqrt(mean_squared_error(train_actual, train_pred))
+        test_mae = mean_absolute_error(test_actual, test_pred)
+        test_rmse = np.sqrt(mean_squared_error(test_actual, test_pred))
         
         # Store results
         results.append({
             'zipcode': zipcode,
             'county': county,
             'state': state,
-            'MAE': round(mae, 4),
-            'RMSE': round(rmse, 4)
+            'train_MAE': round(train_mae, 4),
+            'train_RMSE': round(train_rmse, 4),
+            'test_MAE': round(test_mae, 4),
+            'test_RMSE': round(test_rmse, 4)
         })
         
-        # Generate plot
-        plot_predictions(zipcode, actual_ts, pred_ts, county, state)
-    
+        # Generate combined plot
+        plot_predictions(zipcode, train_actual, train_pred, 
+                        test_actual, test_pred, county, state)
     # Save metrics to CSV
     results_df = pd.DataFrame(results)
-    results_df.to_csv('gnn_county_metrics.csv', index=False)
-    print("\nMetrics saved to gnn_county_metrics.csv")
+    results_df.to_csv('gnn_county_metrics_full.csv', index=False)
+    print("\nMetrics saved to gnn_county_metrics_full.csv")
 
 if __name__ == "__main__":
     main()

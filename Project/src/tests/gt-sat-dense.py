@@ -51,33 +51,30 @@ edge_attr = torch.tensor(edge_attr).float()
 class FullHistoryGAT(nn.Module):
     def __init__(self):
         super().__init__()
-        self.gat = GATConv(1, 64, heads=10, edge_dim=1, concat=False, add_self_loops=False)
-        self.lstm = nn.LSTM(64, 128, num_layers=3, batch_first=True)
-        self.linear = nn.Linear(128, 6)
+        # Remove concat=False (now defaults to True)
+        self.gat = GATConv(1, 64, heads=10, edge_dim=1, add_self_loops=False)  # Changed
+        
+        # Update LSTM input_size to match GAT's output dimension (64 * heads)
+        self.lstm = nn.LSTM(64 * 10, 64, num_layers=4, batch_first=True)  # Changed input_size
+        
+        self.linear = nn.Linear(64, 6)
 
     def forward(self, data):
-        # Input shape: [num_nodes=90, seq_len, features=1]
         x = data.x
-        print(f"\nForward Pass:")
-        print(f"Initial input shape: {x.shape}")
         seq_len = x.size(1)
-        print(f"Sequence length: {seq_len}")
-
-        # Process each timestep through GAT
+        
         gat_outputs = []
         for t in range(seq_len):
-            out = self.gat(x[:, t, :], data.edge_index, data.edge_attr)  # [90, 64]
-            print(f"GAT output shape: {out.shape}")
-            gat_outputs.append(out.unsqueeze(1))  # [90, 1, 64]
+            out = self.gat(x[:, t, :], data.edge_index, data.edge_attr)
+            #print(f"GAT output shape: {out.shape}")  # Now [90, 640] (64*10 heads)
+            gat_outputs.append(out.unsqueeze(1))  # [90, 1, 640]
         
-        # Combine temporal features: [90, seq_len, 64]
-        x = torch.cat(gat_outputs, dim=1)
-        print(f"\nCombined temporal features shape: {x.shape}")
+        x = torch.cat(gat_outputs, dim=1)  # [90, seq_len, 640]
+        #print(f"LSTM input shape: {x.shape}")  # Verify new dimension
         
-        # LSTM processing: [90, seq_len, 64] -> [90, 6]
-        x, _ = self.lstm(x)
-        print(f"LSTM output shape: {x.shape}")
+        x, _ = self.lstm(x)  # Now accepts [90, 406, 640] -> [90, 406, 128]
         return self.linear(x[:, -1, :]).unsqueeze(-1)  # [90, 6, 1]
+
 
 
 
@@ -119,7 +116,7 @@ criterion = nn.MSELoss()
 model.train()
 train_dataset = train_dataset.to(device)
 
-for epoch in range(1):
+for epoch in range(50):
     optimizer.zero_grad()
     pred = model(train_dataset)
     loss = criterion(pred, train_dataset.y)
@@ -130,7 +127,7 @@ for epoch in range(1):
 #%% 9. Evaluation
 def evaluate_and_save_results(model, train_dataset, test_dataset, df):
     # Create output directory
-    #os.makedirs("results", exist_ok=True)
+    os.makedirs("results", exist_ok=True)
     
     # Move datasets to device
     train_dataset = train_dataset.to(device)
@@ -160,22 +157,22 @@ def evaluate_and_save_results(model, train_dataset, test_dataset, df):
         test_mae = mean_absolute_error(test_true[i], test_pred[i])
         test_rmse = np.sqrt(mean_squared_error(test_true[i], test_pred[i]))
         
-        '''metrics.append({
+        metrics.append({
             'county': county_name,
             'train_mae': train_mae,
             'train_rmse': train_rmse,
             'test_mae': test_mae,
             'test_rmse': test_rmse
-        })'''
+        })
 
     # Save metrics to CSV
     metrics_df = pd.DataFrame(metrics)
-    #metrics_df.to_csv("results/county_metrics.csv", index=False)
-    #print("Metrics saved to results/county_metrics.csv")
+    metrics_df.to_csv("dense_results/county_metrics.csv", index=False)
+    print("Metrics saved to results/county_metrics.csv")
 
-    '''
+    
     # Generate plots for each county
-    os.makedirs("results/plots", exist_ok=True)
+    os.makedirs("dense_results/plots", exist_ok=True)
     for i in range(90):
         county_name = df.iloc[i]['county']
         
@@ -198,11 +195,11 @@ def evaluate_and_save_results(model, train_dataset, test_dataset, df):
         
         plt.legend()
         plt.tight_layout()
-        plt.savefig(f"results/plots/{county_name.replace(' ', '_')}.png")
+        plt.savefig(f"dense_results/plots/{county_name.replace(' ', '_')}.png")
         plt.close()
     
     print("Plots saved to results/plots directory")
-    '''
+    
     # Calculate global averages
     global_metrics = {
         'train_mae': metrics_df['train_mae'].mean(),

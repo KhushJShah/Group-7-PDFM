@@ -1,0 +1,91 @@
+zipcode,county,state,MAE,RMSE
+4001,Apache County,AZ,1.1853,1.3153
+4003,Cochise County,AZ,1.9076,1.9944
+4005,Coconino County,AZ,2.3422,2.4403
+4007,Gila County,AZ,2.2782,2.3495
+4009,Graham County,AZ,2.692,2.7501
+4011,Greenlee County,AZ,3.1551,3.1803
+4012,La Paz County,AZ,1.6066,1.6634
+4013,Maricopa County,AZ,2.7151,2.7513
+4015,Mohave County,AZ,1.589,1.6744
+4017,Navajo County,AZ,0.876,1.1453
+4019,Pima County,AZ,2.2602,2.3167
+4021,Pinal County,AZ,1.9283,1.9932
+4023,Santa Cruz County,AZ,1.1151,1.2977
+4025,Yavapai County,AZ,2.4248,2.4622
+4027,Yuma County,AZ,5.1796,5.5842
+6001,Alameda County,CA,1.4856,1.4977
+6003,Alpine County,CA,0.8075,1.0842
+6005,Amador County,CA,0.545,0.6846
+6007,Butte County,CA,0.473,0.5769
+6009,Calaveras County,CA,0.8442,0.9101
+6011,Colusa County,CA,11.2516,11.6904
+6013,Contra Costa County,CA,1.0345,1.0518
+6015,Del Norte County,CA,0.6093,0.7223
+6017,El Dorado County,CA,1.2255,1.2506
+6019,Fresno County,CA,2.9768,3.0265
+6021,Glenn County,CA,1.2072,1.3903
+6023,Humboldt County,CA,0.8174,0.9101
+6025,Imperial County,CA,11.1311,11.1806
+6027,Inyo County,CA,1.776,1.8041
+6029,Kern County,CA,3.4111,3.5022
+6031,Kings County,CA,3.4241,3.5339
+6033,Lake County,CA,0.5774,0.6972
+6035,Lassen County,CA,1.0181,1.1589
+6037,Los Angeles County,CA,0.987,1.0595
+6039,Madera County,CA,2.3406,2.4262
+6041,Marin County,CA,1.9659,1.9724
+6043,Mariposa County,CA,0.7045,0.7339
+6045,Mendocino County,CA,0.5041,0.5829
+6047,Merced County,CA,4.7704,4.9252
+6049,Modoc County,CA,2.7361,3.1947
+6051,Mono County,CA,1.6749,1.6934
+6053,Monterey County,CA,3.2075,3.6495
+6055,Napa County,CA,1.429,1.459
+6057,Nevada County,CA,1.2145,1.2313
+6059,Orange County,CA,1.8455,1.8503
+6061,Placer County,CA,1.4153,1.4278
+6063,Plumas County,CA,4.0138,4.4875
+6065,Riverside County,CA,1.1728,1.192
+6067,Sacramento County,CA,0.8958,0.9206
+6069,San Benito County,CA,1.232,1.3603
+6071,San Bernardino County,CA,0.7205,0.7447
+6073,San Diego County,CA,1.3704,1.3823
+6075,San Francisco County,CA,1.8785,1.8826
+6077,San Joaquin County,CA,1.2681,1.3278
+6079,San Luis Obispo County,CA,2.1736,2.1875
+6081,San Mateo County,CA,2.2725,2.2747
+6083,Santa Barbara County,CA,0.685,0.8731
+6085,Santa Clara County,CA,2.101,2.1079
+6087,Santa Cruz County,CA,1.3467,1.5059
+6089,Shasta County,CA,0.527,0.6555
+6091,Sierra County,CA,1.1541,1.2668
+6093,Siskiyou County,CA,2.0564,2.2751
+6095,Solano County,CA,0.3088,0.3768
+6097,Sonoma County,CA,1.9066,1.9211
+6099,Stanislaus County,CA,1.074,1.1715
+6101,Sutter County,CA,3.3233,3.4832
+6103,Tehama County,CA,0.766,0.8864
+6105,Trinity County,CA,0.9177,1.0702
+6107,Tulare County,CA,5.6708,5.716
+6109,Tuolumne County,CA,0.3504,0.4003
+6111,Ventura County,CA,0.8647,0.9181
+6113,Yolo County,CA,0.4999,0.6025
+6115,Yuba County,CA,1.5336,1.702
+32001,Churchill County,NV,1.6032,1.6056
+32003,Clark County,NV,0.8802,0.889
+32005,Douglas County,NV,1.1607,1.1634
+32007,Elko County,NV,1.975,1.9768
+32009,Esmeralda County,NV,0.8673,1.0873
+32011,Eureka County,NV,1.5737,1.6483
+32013,Humboldt County,NV,1.7817,1.7886
+32015,Lander County,NV,2.2373,2.2403
+32017,Lincoln County,NV,1.0477,1.0662
+32019,Lyon County,NV,0.4407,0.4998
+32021,Mineral County,NV,0.5306,0.6925
+32023,Nye County,NV,1.0237,1.0395
+32027,Pershing County,NV,0.6913,0.7817
+32029,Storey County,NV,1.4753,1.4959
+32031,Washoe County,NV,1.7148,1.7194
+32033,White Pine County,NV,2.0448,2.0505
+32510,Carson City,NV,1.1423,1.1516
