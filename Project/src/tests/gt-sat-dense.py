@@ -52,10 +52,10 @@ class FullHistoryGAT(nn.Module):
     def __init__(self):
         super().__init__()
         # Remove concat=False (now defaults to True)
-        self.gat = GATConv(1, 64, heads=10, edge_dim=1, add_self_loops=False)  # Changed
+        self.gat = GATConv(1, 64, heads=8, edge_dim=1, add_self_loops=False)  # Changed
         
         # Update LSTM input_size to match GAT's output dimension (64 * heads)
-        self.lstm = nn.LSTM(64 * 10, 64, num_layers=4, batch_first=True)  # Changed input_size
+        self.lstm = nn.LSTM(64 * 8, 64, num_layers=4, batch_first=True)  # Changed input_size
         
         self.linear = nn.Linear(64, 6)
 
@@ -80,32 +80,30 @@ class FullHistoryGAT(nn.Module):
 
 #%%
 # Modified Data creation with print statements
-print("\nCreating training dataset...")
-train_dataset = Data(
-    x=torch.tensor(train_data.T, dtype=torch.float).unsqueeze(-1).permute(1, 0, 2),  # [90, 406, 1]
-    edge_index=edge_index,  # Built for 90 nodes
-    edge_attr=edge_attr,
-    y=torch.tensor(test_data.T, dtype=torch.float).unsqueeze(-1).permute(1, 0, 2)     # [90, 6, 1]
-)
-
-print("\nTraining dataset shapes:")
-print(f"Input x shape: {train_dataset.x.shape}")
-print(f"Target y shape: {train_dataset.y.shape}")
-print(f"Edge index shape: {train_dataset.edge_index.shape}")
-print(f"Edge attr shape: {train_dataset.edge_attr.shape}")
-
-test_dataset = Data(
-    x=torch.tensor(test_data.T, dtype=torch.float).unsqueeze(-1).permute(1, 0, 2),    # [90, 6, 1]
+full_dataset = Data(
+    x=torch.tensor(time_series.T, dtype=torch.float).unsqueeze(-1),  # [412, 90, 1]
     edge_index=edge_index,
     edge_attr=edge_attr,
-    y=torch.tensor(test_data.T, dtype=torch.float).unsqueeze(-1).permute(1, 0, 2)
+    y=torch.tensor(time_series.T, dtype=torch.float).unsqueeze(-1)   # [412, 90, 1]
 )
 
-print("\nTesting dataset shapes:")
-print(f"Test input x shape: {test_dataset.x.shape}")
-print(f"Test Target y shape: {test_dataset.y.shape}")
-print(f"Test Edge index shape: {test_dataset.edge_index.shape}")
-print(f"Test Edge attr shape: {test_dataset.edge_attr.shape}")
+# Split into train/test datasets
+train_dataset = Data(
+    x=full_dataset.x[:406],  # First 406 months
+    edge_index=full_dataset.edge_index,
+    edge_attr=full_dataset.edge_attr,
+    y=full_dataset.y[:406]
+)
+
+test_dataset = Data(
+    x=full_dataset.x[-6:],   # Last 6 months
+    edge_index=full_dataset.edge_index,
+    edge_attr=full_dataset.edge_attr,
+    y=full_dataset.y[-6:]
+)
+from torch_geometric.loader import DataLoader
+train_loader = DataLoader([train_dataset], batch_size=1)  # Single graph batch
+test_loader = DataLoader([test_dataset], batch_size=1)
 #%% 7. Training Setup
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = FullHistoryGAT().to(device)
@@ -113,109 +111,76 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 criterion = nn.MSELoss()
 
 #%% 8. Training Loop
-model.train()
-train_dataset = train_dataset.to(device)
-
 for epoch in range(50):
-    optimizer.zero_grad()
-    pred = model(train_dataset)
-    loss = criterion(pred, train_dataset.y)
-    loss.backward()
-    optimizer.step()
-    print(f'Epoch {epoch+1}, Loss: {loss.item():.4f}')
-
-#%% 9. Evaluation
-def evaluate_and_save_results(model, train_dataset, test_dataset, df):
-    # Create output directory
-    os.makedirs("results", exist_ok=True)
-    
-    # Move datasets to device
-    train_dataset = train_dataset.to(device)
-    test_dataset = test_dataset.to(device)
-    
-    # Evaluate on both train and test sets
-    model.eval()
-    
-    # Get predictions for datasets
-    with torch.no_grad():
-        train_pred = model(train_dataset).cpu().numpy().squeeze()  # [90, 6]
-        train_true = train_dataset.y.cpu().numpy().squeeze()
+    for batch in train_loader:
+        batch = batch.to(device)
+        optimizer.zero_grad()
         
-        test_pred = model(test_dataset).cpu().numpy().squeeze()    # [90, 6]
-        test_true = test_dataset.y.cpu().numpy().squeeze()
+        pred = model(batch)        # [406, 90]
+        true = batch.y.squeeze(-1) # [406, 90]
+        
+        loss = criterion(pred, true)
+        loss.backward()
+        optimizer.step()
+        
+    print(f'Epoch {epoch+1}, Loss: {loss.item():.4f}')
+#%% 9. Evaluation
+def evaluate_and_save(model, full_dataset, df):
+    model.eval()
+    with torch.no_grad():
+        # Get all predictions at once
+        all_pred = model(full_dataset).cpu().numpy().squeeze()  # [412, 90]
+        all_true = full_dataset.y.cpu().numpy().squeeze()       # [412, 90]
 
-    # Calculate metrics per county
+    # Calculate metrics
     metrics = []
-    for i in range(90):
+    for i in range(n_counties):
         county_name = df.iloc[i]['county']
         
-        # Train metrics
-        train_mae = mean_absolute_error(train_true[i], train_pred[i])
-        train_rmse = np.sqrt(mean_squared_error(train_true[i], train_pred[i]))
+        # Training period metrics (first 406 months)
+        train_rmse = np.sqrt(mean_squared_error(
+            all_true[full_dataset.train_mask, i], 
+            all_pred[full_dataset.train_mask, i]
+        ))
         
-        # Test metrics
-        test_mae = mean_absolute_error(test_true[i], test_pred[i])
-        test_rmse = np.sqrt(mean_squared_error(test_true[i], test_pred[i]))
-        
+        # Test period metrics (last 6 months)
+        test_rmse = np.sqrt(mean_squared_error(
+            all_true[full_dataset.test_mask, i],
+            all_pred[full_dataset.test_mask, i]
+        ))
+
         metrics.append({
             'county': county_name,
-            'train_mae': train_mae,
             'train_rmse': train_rmse,
-            'test_mae': test_mae,
             'test_rmse': test_rmse
         })
 
-    # Save metrics to CSV
+    # Save results (keep your original code)
     metrics_df = pd.DataFrame(metrics)
-    metrics_df.to_csv("dense_results/county_metrics.csv", index=False)
-    print("Metrics saved to results/county_metrics.csv")
+    metrics_df.to_csv('dense_gnn/results.csv', index=False)
 
-    
-    # Generate plots for each county
-    os.makedirs("dense_results/plots", exist_ok=True)
-    for i in range(90):
-        county_name = df.iloc[i]['county']
+    # Updated plotting with train/test separation
+    os.makedirs('dense_gnn/plots', exist_ok=True)
+    for i in range(n_counties):
+        plt.figure(figsize=(12, 6))
         
-        plt.figure(figsize=(15, 6))
+        # Plot full timeline
+        plt.plot(all_true[:, i], label='Actual', color='blue')
+        plt.plot(all_pred[:, i], label='Predicted', color='orange', linestyle='--')
         
-        # Training plot
-        plt.subplot(1, 2, 1)
-        plt.plot(train_true[i], label='Actual', color='blue', alpha=0.7)
-        plt.plot(train_pred[i], label='Predicted', color='orange', alpha=0.7)
-        plt.title(f"{county_name}\nTraining Predictions")
-        plt.xlabel("Months (1-406)")
-        plt.ylabel("Unemployment Rate")
+        # Add vertical split line
+        plt.axvline(x=406, color='red', linestyle=':', label='Train/Test Split')
         
-        # Testing plot
-        plt.subplot(1, 2, 2)
-        plt.plot(test_true[i], label='Actual', color='blue', alpha=0.7)
-        plt.plot(test_pred[i], label='Predicted', color='orange', alpha=0.7)
-        plt.title(f"{county_name}\nTest Predictions")
-        plt.xlabel("Months (407-412)")
-        
+        plt.title(f"{df.iloc[i]['county']} Unemployment Forecast")
+        plt.xlabel("Months")
+        plt.ylabel("Normalized Rate")
         plt.legend()
-        plt.tight_layout()
-        plt.savefig(f"dense_results/plots/{county_name.replace(' ', '_')}.png")
+        plt.savefig(f'dense_gnn/plots/{df.iloc[i]["county"].replace(" ", "_")}_full.png')
         plt.close()
-    
-    print("Plots saved to results/plots directory")
-    
-    # Calculate global averages
-    global_metrics = {
-        'train_mae': metrics_df['train_mae'].mean(),
-        'train_rmse': metrics_df['train_rmse'].mean(),
-        'test_mae': metrics_df['test_mae'].mean(),
-        'test_rmse': metrics_df['test_rmse'].mean()
-    }
-    
-    print("\nGlobal Average Metrics:")
-    print(f"Train MAE: {global_metrics['train_mae']:.4f}")
-    print(f"Train RMSE: {global_metrics['train_rmse']:.4f}")
-    print(f"Test MAE: {global_metrics['test_mae']:.4f}")
-    print(f"Test RMSE: {global_metrics['test_rmse']:.4f}")
 
-# Usage after training:
-evaluate_and_save_results(model, train_dataset, test_dataset, df)
+# Update the evaluation call
+print("\nEvaluating model...")
+evaluate_and_save(model, full_dataset, df)  # Pass single dataset
 
 
 # %%

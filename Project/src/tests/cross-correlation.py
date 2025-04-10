@@ -1,91 +1,87 @@
 #%%
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.signal import correlate
-import os
 
 #%%
+# Function to load data
 def load_data(file_path):
     df = pd.read_csv(file_path)
     ts_cols = [col for col in df.columns if col.startswith(('19', '20'))]
     df['ts_data'] = df[ts_cols].values.tolist()
     return df[['zipcode', 'county', 'state', 'ts_data']]
 
-def compute_cross_correlations(df, max_lag=2):
+#%%
+# Function to compute cross-correlations for multiple lags
+def compute_cross_correlations(df, max_lag=6):
     # Create a matrix of time series
     zipcodes = df.zipcode.unique()
     ts_matrix = np.array(df.ts_data.tolist())
     
     # Initialize correlation storage
     correlations = []
-    
-    # Compute pairwise correlations
+
+    # Compute pairwise correlations for all zipcodes
     for i, target_zc in enumerate(zipcodes):
+        target_ts = ts_matrix[i]
+        target_mean = np.nanmean(target_ts)
+        target_std = np.nanstd(target_ts)
+        
         for j, source_zc in enumerate(zipcodes):
             if i != j:
-                target_ts = ts_matrix[i]
                 source_ts = ts_matrix[j]
-                
-                # Normalize the data
-                target_norm = (target_ts - np.mean(target_ts)) / np.std(target_ts)
-                source_norm = (source_ts - np.mean(source_ts)) / np.std(source_ts)
-                
-                # Compute cross-correlation
-                corr = correlate(target_norm, source_norm, mode='full')
-                max_lag_idx = len(target_ts) - 1
-                
-                # Extract lags 1 and 2
-                lag1 = corr[max_lag_idx + 1]
-                lag2 = corr[max_lag_idx + 2]
-                
+                source_mean = np.nanmean(source_ts)
+                source_std = np.nanstd(source_ts)
+
+                # Compute correlations for all lags
+                lag_corrs = {}
+                for lag in range(1, max_lag + 1):
+                    # Align the time series with lag
+                    min_length = min(len(target_ts), len(source_ts) - lag)
+                    if min_length < 10:  # Ensure sufficient overlap
+                        continue
+                    
+                    target_slice = target_ts[:min_length]
+                    source_slice = source_ts[lag:lag + min_length]
+
+                    # Remove pairs with missing values
+                    valid_mask = ~(np.isnan(target_slice) | np.isnan(source_slice))
+                    if np.sum(valid_mask) < 10:
+                        continue
+                    
+                    target_valid = target_slice[valid_mask]
+                    source_valid = source_slice[valid_mask]
+
+                    # Compute Pearson correlation
+                    corr_coef = np.corrcoef(target_valid, source_valid)[0, 1]
+                    lag_corrs[f'lag_{lag}_corr'] = corr_coef
+
                 correlations.append({
                     'source_zipcode': source_zc,
                     'target_zipcode': target_zc,
-                    'lag1_corr': lag1,
-                    'lag2_corr': lag2
+                    **lag_corrs  # Add lag correlation values as columns
                 })
-    
+
     return pd.DataFrame(correlations)
 
-def plot_top_correlations(corr_df, target_zipcode, n_top=5):
-    # Filter and sort correlations
-    target_corr = corr_df[corr_df.target_zipcode == target_zipcode]
-    top_lag1 = target_corr.nlargest(n_top, 'lag1_corr')
-    top_lag2 = target_corr.nlargest(n_top, 'lag2_corr')
-    
-    # Create visualization
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
-    
-    # Lag 1 Plot
-    ax1.barh(top_lag1.source_zipcode.astype(str), top_lag1.lag1_corr, color='darkblue')
-    ax1.set_title(f'Top {n_top} Lag-1 Correlations for {target_zipcode}')
-    ax1.set_xlabel('Correlation Coefficient')
-    
-    # Lag 2 Plot
-    ax2.barh(top_lag2.source_zipcode.astype(str), top_lag2.lag2_corr, color='darkgreen')
-    ax2.set_title(f'Top {n_top} Lag-2 Correlations for {target_zipcode}')
-    ax2.set_xlabel('Correlation Coefficient')
-    
-    plt.tight_layout()
-    plt.savefig(f'correlations_{target_zipcode}.png', dpi=300, bbox_inches='tight')
-    plt.close()
-
 #%%
+# Main function to execute the workflow
 def main():
     # Load and prepare data
-    df = load_data('C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/merged_data_unemployment_r9.csv')
+    file_path = 'C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/merged_data_unemployment_r9.csv'
+    df = load_data(file_path)
     
-    # Compute correlations
-    corr_df = compute_cross_correlations(df)
+    # Compute correlations for multiple lags (up to max_lag=6)
+    max_lag = 6
+    corr_df = compute_cross_correlations(df, max_lag=max_lag)
     
-    # Analyze specific zipcode (example: 90210)
-    target_zipcode = 4001  # Replace with your zipcode of interest
-    plot_top_correlations(corr_df, target_zipcode)
+    # Save all correlations to CSV file
+    output_file = 'cross_correlations.csv'
+    corr_df.to_csv(output_file, index=False)
     
-    # Save all correlations
-    corr_df.to_csv('cross_correlations.csv', index=False)
+    print(f"Cross-correlation results saved to {output_file}")
 
 if __name__ == "__main__":
     main()
+
 # %%
