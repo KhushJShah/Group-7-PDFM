@@ -17,111 +17,143 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 import matplotlib.pyplot as plt
 import os
 
-try:
-    df = pd.read_csv('C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/merged_data_unemployment_r9.csv')
-    print("Columns in dataset:", df.columns.tolist())
 
-    # Filter counties
-    selected_counties = ['Los Angeles County', 'Alameda County','Pinal County','Clark County','Maricopa County','Orange County','San Diego County','Washoe County']
-    filtered_df = df[df['county'].isin(selected_counties)].copy()
-
-    if filtered_df.empty:
-        raise ValueError("No data found for specified counties")
-
-except Exception as e:
-    print(f"Error: {e}")
-    raise
-
-print(filtered_df)
-
-time_columns = df.filter(regex='^(19|20)').columns.tolist()
-print(time_columns)
-
-last_6_months = time_columns[-6:]
-
-window_size = 100
-prediction_horizon = 6
-n_features = 1
-epochs = 10
-batch_size = 32
 
 #%%
-def create_sequences(data, window_size, horizon, step=1):
-    """Create sequences with configurable step size"""
+SELECTED_COUNTIES = [
+    'Los Angeles County', 'Alameda County', 'Pinal County',
+    'Clark County', 'Maricopa County', 'Orange County',
+    'San Diego County', 'Washoe County'
+]
+
+WINDOW_SIZE = 100       # Use 100 months to predict next month
+PREDICTION_HORIZON = 6  # Forecast 6 months recursively
+N_FEATURES = 1          # Univariate time series
+EPOCHS = 50
+BATCH_SIZE = 32
+df = pd.read_csv('C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/merged_data_unemployment_r9.csv')
+time_columns = df.filter(regex='^(19|20)').columns.tolist()
+results = []
+
+#%%
+def create_recursive_sequences(data, window_size):
+    """Create sequences for single-step prediction"""
     X, y = [], []
-    for i in range(0, len(data) - window_size - horizon + 1, step):
+    for i in range(len(data) - window_size):
         X.append(data[i:i+window_size])
-        y.append(data[i+window_size:i+window_size+horizon])
+        y.append(data[i+window_size])
     return np.array(X), np.array(y)
 
-for county_name in selected_counties:
+
+def recursive_forecast(model, initial_window, steps, test_dates):
+    """Generate recursive predictions with debug info"""
+    predictions = []
+    current_window = initial_window.copy()
+    
+    print("\nPrediction Process:")
+    for step in range(steps):
+        # Reshape input for LSTM
+        x = current_window[-WINDOW_SIZE:].reshape(1, WINDOW_SIZE, N_FEATURES)
+        
+        # Predict next value
+        pred = model.predict(x, verbose=0)[0][0]
+        predictions.append(pred)
+        
+        # Update window
+        current_window = np.append(current_window[1:], pred)
+        
+        # Debug info
+        print(f"Step {step+1}/{steps}:")
+        print(f"Predicting {test_dates[step]} | Predicted value: {pred:.4f}")
+        print(f"Current window size: {len(current_window)} months")
+        print("--------------------------------------------------")
+    
+    return np.array(predictions)
+
+#%%
+for county_name in SELECTED_COUNTIES:
     print(f"\n{'='*40}\nProcessing {county_name}\n{'='*40}")
-
-    # Extract time series data
-    county_data = filtered_df[filtered_df['county'] == county_name]
-    time_series = county_data.filter(regex='^(19|20)').values.astype(np.float32)
-    ts_data = time_series.reshape(-1, 1)
-
-    # Train/test split
-    train_data = ts_data[:406]
-    test_data = ts_data[406-100:406+6]
-
-    # Model setup
+    
+    # Extract county data
+    county_data = df[df['county'] == county_name]
+    if county_data.empty:
+        print(f"Data not found for {county_name}")
+        continue
+        
+    # Prepare time series data
+    ts = county_data.filter(regex='^(19|20)').values.flatten().astype(np.float32)
+    ts = ts.reshape(-1, 1)
+    
+    # Train/test split with debug info
+    train = ts[:406]
+    test = ts[406:412]
+    test_dates = time_columns[-6:]
+    
+    print(f"\nData Configuration:")
+    print(f"Total training months: {len(train)} (Months: {time_columns[0]} to {time_columns[405]})")
+    print(f"Test months: {len(test)} (Months: {test_dates[0]} to {test_dates[-1]})")
+    
+    # Create training sequences
+    X_train, y_train = create_recursive_sequences(train, WINDOW_SIZE)
+    print(f"\nTraining Info:")
+    print(f"Created {len(X_train)} training sequences")
+    print(f"Each sequence: {WINDOW_SIZE} months -> 1 month prediction")
+    
+    # Build and train model
     model = tf.keras.Sequential([
-        tf.keras.layers.LSTM(64, return_sequences=True,
-                            input_shape=(window_size, n_features)),
+        tf.keras.layers.LSTM(64, return_sequences=True, 
+                            input_shape=(WINDOW_SIZE, N_FEATURES)),
         tf.keras.layers.LSTM(64, return_sequences=True),
-        tf.keras.layers.LSTM(32, return_sequences=False),
-        tf.keras.layers.Dense(prediction_horizon)
+        tf.keras.layers.LSTM(32),
+        tf.keras.layers.Dense(1)
     ])
     model.compile(optimizer='adam', loss='mse')
-
-    # Training loop with progress tracking
-    current_window = window_size
-    iteration = 1
-    while current_window <= 406 - prediction_horizon:
-        current_data = train_data[:current_window]
-        X, y = create_sequences(current_data, window_size, prediction_horizon, step=1)
-
-        if len(X) > 0:
-            print(f"\nIteration {iteration}:")
-            print(f"Training Window: {current_window} months")
-            print(f"Prediction Horizon: {prediction_horizon} months")
-            print(f"Generated Sequences: {len(X)}")
-
-            model.fit(X, y, epochs=epochs, batch_size=batch_size, verbose=0)
-            iteration += 1
-
-        current_window += 1  # Changed from += prediction_horizon to +=1 for 1-month steps
-
-    # Final prediction and evaluation
-    X_test = train_data[-window_size:].reshape(1, window_size, n_features)
-    y_true = ts_data[406:406+6]
-    y_pred = model.predict(X_test).flatten()
-
+    
+    print("\nModel Training:")
+    print(f"Training on {len(X_train)} samples for {EPOCHS} epochs")
+    model.fit(X_train, y_train, 
+             epochs=EPOCHS,
+             batch_size=BATCH_SIZE,
+             verbose=0)
+    print("Training completed")
+    
+    # Generate recursive predictions
+    initial_window = train[-WINDOW_SIZE:]
+    predictions = recursive_forecast(model, initial_window, PREDICTION_HORIZON, test_dates)
+    
     # Calculate metrics
-    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
-    mae = mean_absolute_error(y_true, y_pred)
-
-    # Final report
-    print(f"\n{'='*40}")
-    print(f"{county_name} Final Results:")
-    print(f"Total Training Months Used: {current_window-1}")  # -1 because of last increment
-    print(f"Final Test Months: {len(y_true)}")
-    print(f"RMSE: {rmse:.4f}")
-    print(f"MAE: {mae:.4f}")
-    print(f"{'='*40}")
-
-    # Plotting (unchanged)
+    rmse = np.sqrt(mean_squared_error(test, predictions))
+    mae = mean_absolute_error(test, predictions)
+    
+    # Debug output
+    print("\nPrediction Results:")
+    print(f"{'Test Month':<15} | {'Actual':<10} | {'Predicted':<10} | {'Error':<10}")
+    print("-" * 50)
+    for date, true, pred in zip(test_dates, test.flatten(), predictions):
+        error = true - pred
+        print(f"{date:<15} | {true:<10.4f} | {pred:<10.4f} | {error:<10.4f}")
+    
+    results.append({
+        'County': county_name,
+        'RMSE': rmse,
+        'MAE': mae
+    })
+    
+    # Plot results
     plt.figure(figsize=(12,6))
-    plt.plot(last_6_months, y_true, 'o-', label='Actual')
-    plt.plot(last_6_months, y_pred, 'x--', label='Predicted')
-    plt.title(f'{county_name} Unemployment Prediction')
+    plt.plot(test_dates, test, 'o-', label='Actual')
+    plt.plot(test_dates, predictions, 'x--', label='Predicted')
+    plt.title(f'{county_name} Unemployment Rate Forecast\nRecursive LSTM')
     plt.xticks(rotation=45)
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+
+# Save results
+results_df = pd.DataFrame(results)
+print("\nFinal Results Summary:")
+print(results_df)
 
 
 
