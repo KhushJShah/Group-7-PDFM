@@ -68,7 +68,7 @@ def compute_cross_correlations(df, max_lag=6):
 # Main function to execute the workflow
 def main():
     # Load and prepare data
-    file_path = 'C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/merged_data_unemployment_r9.csv'
+    file_path = r'Project\data\merged_data_unemployment_r9.csv'
     df = load_data(file_path)
     
     # Compute correlations for multiple lags (up to max_lag=6)

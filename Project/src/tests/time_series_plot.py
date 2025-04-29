@@ -1,3 +1,6 @@
+'''
+This file plots the time series graph for the counties for all the unemployment data from 412 months.
+'''
 #%%
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -40,7 +43,7 @@ def plot_all_zipcodes(df, output_dir='timeseries_plots'):
         plt.close()
 
 #%%
-df = pd.read_csv('C:/Users/nupur/computer/Desktop/Group-7-PDFM/Project/data/merged_data_unemployment_r9.csv')
+df = pd.read_csv('Project/data/merged_data_unemployment_r9.csv')
 plot_all_zipcodes(df)
 
 # %%

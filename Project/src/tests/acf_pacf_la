@@ -1,0 +1,30 @@
+#%%
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+
+# Load the dataset
+df = pd.read_csv(r"Project\data\merged_data_unemployment_r9.csv")
+
+# Filter for Los Angeles County
+la_row = df[df['county'] == 'Los Angeles County']
+
+# Select only the time series columns (assuming they start with a year)
+time_series_cols = [col for col in df.columns if col[:4].isdigit()]
+la_series = la_row[time_series_cols].values.flatten()
+
+# Plot and save ACF
+plt.figure(figsize=(12, 6))
+plot_acf(la_series, lags=40)
+plt.title('ACF for Los Angeles County Unemployment')
+plt.savefig('acf_los_angeles.png')
+plt.close()
+
+# Plot and save PACF
+plt.figure(figsize=(12, 6))
+plot_pacf(la_series, lags=40)
+plt.title('PACF for Los Angeles County Unemployment')
+plt.savefig('pacf_los_angeles.png')
+plt.close()
+
+# %%
